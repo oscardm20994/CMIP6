@@ -18,7 +18,7 @@ plotting_routines.py - set of plotting functions
 
 # Sample Outputs
 
-
+SSWs_CMIP6_ALL_models.png - Comparison of mean SSW rates from each model
 
 
 
