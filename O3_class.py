@@ -31,98 +31,7 @@ from eofs.standard import Eof
 
 
 	
-def get_coord_from_list(List, coord_name):
-	coord = []
-	
-	for i in range(len(List)):
-		coord.append(List[i].coord(coord_name).points[0])
-	
-	return coord
 
-	## get error for SSW per season in function
-def warmings_per_decade(SSW_year2, SSW_month, years):
-	#SSW_year2 = correct_nov_year(SSW_year, SSW_month)
-	year_count = np.empty(0)
-	running = np.empty(0)
-	#### count number per season
-	SSW_year_counter = Counter(SSW_year2)
-	for i in range(len(years)):
-			year_count = np.append(year_count, SSW_year_counter[years[i]])
-	
-	### bootstrap resampling method
-	rates = np.empty(0)
-	resample_interval = 50
-	bound = 5
-	for i in range(10000):
-		rates = np.append(rates, np.mean(np.random.choice(year_count, resample_interval, replace = False)))
-		
-	#get percentile of each of these rates		
-	percentiles = np.percentile(rates, np.arange(0,101,1))
-		
-	#extract desired error % and return
-	upper = percentiles[100 - bound]
-	lower = percentiles[bound]
-		
-	SSWrate_Er = [upper, lower]
-			
-	return SSWrate_Er 
-
- 
-	##function to store variable composites for O3 10 percentile bands
-def O3_bands_vs_EPdiv(O3, EP_div, years):
-		### constrain winter vars
-		EP_divND = EP_div.extract(iris.Constraint(month = ['Nov', 'Dec']))
-		EP_divJFM = EP_div.extract(iris.Constraint(month = 'Jan'))
-		EP_divASO = EP_div.extract(iris.Constraint(month = ['Aug', 'Sep', 'Oct']))
-		EP_divMJJ = EP_div.extract(iris.Constraint(month = ['May', 'Jun', 'Jul']))
-
-	
-		#isolate 10-20hPa ozone in early winter
-		ASON = O3.extract(iris.Constraint(month = ['Aug','Sep','Oct'])).extract(iris.Constraint(air_pressure = 1000.))
-		ASON_all = ASON.aggregated_by('year', iris.analysis.MEAN)
-		print ASON_all
-	
-		#divide time series into bands. take the years in which data lies in the bands and
-		#count SSWs
-		O3_bands = np.percentile(ASON_all.data, np.arange(0,110,10))
-		print O3_bands
-		EP_divs_in_bands = iris.cube.CubeList([])
-		ASO = iris.cube.CubeList([])
-		MJJ = iris.cube.CubeList([])
-
-		sigs = np.empty(0)
-		Er = np.zeros([10, 2])
-
-		#loop over bands counting SSWs
-		for i in range(len(O3_bands) - 1):
-			print i
-			#get the years in the band	
-			years_in_band = years[np.where(np.logical_and(ASON_all.data>=O3_bands[i], ASON_all.data<=O3_bands[i+1]))]
-	
-			# store EP div cubes in the following winter	
-			#EP_div_temp = iris.cube.CubeList([EP_divND.extract(iris.Constraint(year = years_in_band)), EP_divJFM.extract(iris.Constraint(year = years_in_band + 1))])
-			EP_div_temp =  EP_divJFM.extract(iris.Constraint(year = years_in_band + 1))
-
-			#data = np.concatenate((EP_div_temp[0].data, EP_div_temp[1].data), axis = 0) 
-			data = np.mean(EP_div_temp.data, axis = 0)
-		
-			#get cube template
-			cube = EP_divND[0,:]
-			cube.data = data
-		
-			#append divs in bands list
-			EP_divs_in_bands.append(cube)
-             #get anomaly cube
-			anom = cube - EP_divJFM.data
-
-		anoms = iris.cube.CubeList([EP_divs_in_bands[j] - EP_divJFM.data for j in range(10)])
-			#ASO.append(EP_divASO.extract(iris.Constraint(year = years_in_band)).collapsed('time', iris.analysis.MEAN))
-			#MJJ.append(EP_divMJJ.extract(iris.Constraint(year = years_in_band)).collapsed('time', iris.analysis.MEAN))
-		
-		return EP_divs_in_bands 
- 
- 
- 
 class O3_class_def:	
 	
 	## init function
@@ -134,6 +43,7 @@ class O3_class_def:
 		self.U = U
 		self.U_eq = U_eq
 	### function to get the 
+	
 	def extract_SSW_from_Y(self, Y_list):
 	
 		Y_years_plus1 = []
@@ -218,13 +128,6 @@ class O3_class_def:
 	
 		return
 	
-	
-#, ASO, MJJ
-	
-	
-
-	
-	
 	#call composite function and EOFs above for T, U and SW heating
 	def get_composites(self):
          self.U_inO3 = O3_bands_vs_EPdiv(self.O3, self.U, self.years )
@@ -243,7 +146,7 @@ class O3_class_def:
 	
 	
 	##### consider the eof of composites for each band
-def eof(in_bands):
+	def eof(in_bands):
 		data = np.array([in_bands[i].data for i in range(len(in_bands))])
 	
 		#take eof over time dimension
