@@ -1,5 +1,5 @@
 # CMIP6
-CMIP6 repository contains various python scripts that processes data from a suite of cliamte models submitted to the  [6th Coupled Model Intercomparison Project](https://www.wcrp-climate.org/wgcm-cmip/wgcm-cmip6) (CMIP6). These scripts clean and wrangle raw input data from a suite of models and define classes whose instances contain key cliamte indices output by each model. Also included is a set of sample output figure produced by scripts in this repository which compares model performance across the project. 
+CMIP6 repository contains various python scripts that cleans and processes data from a suite of climate models submitted to the [6th Coupled Model Intercomparison Project](https://www.wcrp-climate.org/wgcm-cmip/wgcm-cmip6) (CMIP6). These scripts clean and wrangle raw input data from a suite of models and define classes whose instances contain key cliamte indices output by each model. Also included is a set of sample output figure produced by scripts in this repository which compares model performance across the project. 
 
 # Files
 rundown of scripts:
@@ -12,9 +12,15 @@ O3_class.py - definiton of an ozone (O3) class whose instances contain indices t
 
 equator_class.py, mean_state_class.py - definiton of a two classes which contain temperature and wind metrics from the equatorial region and mean state variables for each model.
 
-initialise_all.py - script which loads data from all models, cleans data where necessary and initialises instances of classes defined above. 
+initialise_all.py - script which loads data from all models, cleans data where necessary and initialises instances of classes defined above. N.B. to run this initialisation, user must have required CMIP6 data only available to those with [ESGF](https://esgf-node.llnl.gov/search/cmip6/) credentials. 
 
 plotting_routines.py - set of plotting functions
+
+# Sample Outputs
+
+
+
+
 
 
 
